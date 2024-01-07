@@ -1,0 +1,132 @@
+>>> from models.models import *     
+
+>>> u2 = User.objects.create_user(username='Kpw')
+
+>>> u1 = User.objects.create_user(username='Zai') 
+
+>>> Author.objects.create(authorUser=u1)
+  
+>>> Author.objects.create(authorUser=u2) 
+
+>>> Category.objects.create(name='Cyber-sport')
+
+>>> Category.objects.create(name='Sport') 
+     
+>>> Category.objects.create(name='News')  
+
+>>> Category.objects.create(name='Weather') 
+
+>>> Post.objects.create(author=author, categoryType='NW', title='sometitle', text='prostotext')
+ 
+>>> Post.objects.create(author=author, categoryType='AR', title='sometitle', text='supertext')  
+  
+>>> Post.objects.create(author=author, categoryType='AR', title='sometitle', text='ultratext=)')
+ 
+>>> Post.objects.get(id=1)
+<Post: Post object (1)>
+>>> Post.objects.get(id=1).title                                                                 
+'sometitle'
+
+
+>>> Post.objects.get(id=1).postCategory.add(Category.objects.get(id=1))
+
+
+>>> Post.objects.get(id=1).postCategory.add(Category.objects.get(id=2)) 
+
+
+>>> Comment.objects.create(commentPost=Post.objects.get(id=1), commentUser=Author.objects.get(id=1).authorUser, text='Super!') 
+  
+>>> Comment.objects.create(commentPost=Post.objects.get(id=2), commentUser=Author.objects.get(id=2).authorUser, text='Super!') 
+
+>>> Comment.objects.create(commentPost=Post.objects.get(id=1), commentUser=Author.objects.get(id=2).authorUser, text='Super!') 
+
+>>> Comment.objects.create(commentPost=Post.objects.get(id=2), commentUser=Author.objects.get(id=1).authorUser, text='Super!')  
+>>> Comment.objects.get(id=1).like()
+>>> Comment.objects.get(id=2).like() 
+>>> Comment.objects.get(id=2).like()
+>>> Comment.objects.get(id=3).like() 
+>>> Comment.objects.get(id=3).like() 
+>>> Comment.objects.get(id=1).like() 
+>>> Comment.objects.get(id=1).like()
+>>> Comment.objects.get(id=4).like() 
+>>> Comment.objects.get(id=4).dislike()
+>>> Comment.objects.get(id=1).dislike() 
+>>> Comment.objects.get(id=2).dislike() 
+>>> Comment.objects.get(id=3).dislike() 
+>>> Comment.objects.get(id=3).rating 
+
+>>> a = Author.objects.get(id=1)
+>>> a.update_rating()
+>>> a.ratingAuthor
+2
+
+
+>>> a = Author.objects.order_by('-ratingAuthor')[:1] 
+>>> a                                                
+<QuerySet [<Author: Author object (1)>]>
+>>> a = Author.objects.order_by('-ratingAuthor')    
+>>> a                                            
+<QuerySet [<Author: Author object (1)>, <Author: Author object (2)>, <Author: Author object (3)>]>
+>>>
+AttributeError: 'QuerySet' object has no attribute 'ratingAuthor'
+>>> for i in a:
+...     i.ratingAuthor
+...     i.authorUser.username
+... 
+2
+'Zai'
+0
+'Kpw'
+0
+'12'
+
+
+>>> Post.objects.get(id=1).dataCreation              
+datetime.datetime(2024, 1, 2, 12, 52, 52, 375562, tzinfo=datetime.timezone.utc)
+
+>>> Post.objects.get(id=1).rating    
+0
+
+>>> Post.objects.get(id=1).rating    
+0
+>>> a = Author.objects.order_by('-ratingAuthor')
+>>> a
+<QuerySet [<Author: Author object (1)>, <Author: Author object (2)>, <Author: Author object (3)>]>
+>>> for i in a:
+...     i.ratingAuthor
+...     i.authorUser.username
+...     i.dataCreation
+...     i.rating
+...     i.preview
+... 
+2
+'Zai'
+Traceback (most recent call last):
+  File "<console>", line 4, in <module>
+AttributeError: 'Author' object has no attribute 'dataCreation'
+
+>>> a = Author.objects.order_by('-ratingAuthor')
+>>> a           
+<QuerySet [<Author: Author object (1)>, <Author: Author object (2)>, <Author: Author object (3)>]>
+>>> for i in a:    hor
+...     i.ratingAuthor    ame                  
+...     i.authorUser.username                    
+... 
+2
+'Zai'
+0
+'Kpw'
+0
+'12'
+pos
+
+>>> Post.objects.order_by('-rating')[:1].values('author', 'rating', 'title', 'dataCreation') 
+<QuerySet [{'author': 1, 'rating': 0, 'title': 'sometitle', 'dataCreation': datetime.datetime(2024, 1, 2, 12, 52, 52, 375562, tzinfo=datetime.timezone.utc)}]>
+
+>>> post = Post.objects.order_by('-rating')[:1].values('author__authorUser__username') 
+>>> post                                                                              
+<QuerySet [{'author__authorUser__username': 'Zai'}]>
+
+>>> Post.objects.order_by('-rating')[0].preview()
+'prostotext...'
+
