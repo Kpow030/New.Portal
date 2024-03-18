@@ -1,0 +1,12 @@
+{% extends 'index.html' %}
+
+{% block content %}
+  <h1>Delete Post</h1>
+  <p>Вы уверены, что хотите удалить новость?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Delete</button>
+  </form>
+<p>{{ new.title }} : {{new.date_pub }}</p>
+<p>{{ new.text }}</p>
+{% endblock %}

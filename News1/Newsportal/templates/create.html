@@ -1,0 +1,12 @@
+{% extends 'index.html' %}
+
+{% block title %}
+    <h1>Создать новость</h1>
+    <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Создать</button>
+    </form>
+<p>{{ new.title }} : {{new.date_pub }}</p>
+<p>{{ new.text }}</p>
+{% endblock %}
