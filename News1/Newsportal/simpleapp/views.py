@@ -1,7 +1,11 @@
 from datetime import datetime
-from  django.shortcuts import render
-from django.views.generic import CreateView, UpdateView, DeleteView
-from .models import Post
+
+from django.contrib.auth.decorators import login_required
+from  django.shortcuts import render, get_object_or_404
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+
+
+from .models import Post, Category
 from .forms import PostSearchForm, PostForm
 from .filters import NewFilter
 
@@ -95,4 +99,31 @@ class PostDeleteView(DeleteView):
     success_url = '/news/'
     template_name = 'news/delete.html'
 
+
+class CategoryList(ListView):
+    model = Post
+    template_name = 'news/category_list.html'
+    context_object_name = 'category_news_list'
+
+
+    def get_queryset(self):
+        self.category = get_object_or_404(Category, id=self.kwargs['pk'])
+        queryset = Post.objects.filter(category=self.category).order_by('-date')
+        return queryset
+
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_not_subscriber'] = self.request.user not in self.category.subscribers.all()
+        context['category'] = self.category
+        return context
+
+@login_required
+def subscribe(request, pk):
+    user = request.user
+    category = CategoryList.objects.get(id=pk)
+    category.subscribers.add(user)
+
+    message = 'Вы успешно подписали на категории'
+    return render(request, 'news/subscribe.html',{'category': category, 'message': message})
 # Create your views here.
