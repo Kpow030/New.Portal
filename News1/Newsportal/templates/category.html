@@ -1,0 +1,30 @@
+{% extends 'templates/index.html' %}
+    News list
+{% block title %}
+
+
+{% block content %}
+<h1 class="text-center">Новости <span class="text-nuted fs-6 fn-normal">Всего: {{ page_obj.paginator.count }}</span></h1>
+    {% if is_not_subscriber %}
+        <p class="text-center"><a href="{% url 'subscribe' category.id %}" class="btn btn-secondary btn-sn">Подписаться</a> </p>
+    {% endif %}
+<hr>
+
+<ul calss="list-group list-groupfkush">
+    {% for post in category_news_list %}
+        <li class="list-group-iten">
+            <small class="fw-bold">{{ post.date | date:'d M Y' }}</small>
+            <a href="{% url 'detail' post.id %}">{{ post.title }}</a>
+            <small class="text-muted ">(автор: {{ post.author}})</small> <br>
+            <small class="fw-bold">категории:
+                {% for category in post.category.all %}
+                    <a href="{% url 'category' category.id%}"{{ category }}</a>
+                {% endfor %}
+            </small>
+        </li>
+</ul>
+
+
+<p>{{ new.title }} : {{new.date_pub }}</p>
+<p>{{ new.text }}</p>
+{% endblock %}
