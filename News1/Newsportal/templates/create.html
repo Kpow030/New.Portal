@@ -1,5 +1,7 @@
-{% extends 'index.html' %}
-
+{% extends 'templates/index.html' %}
+{% load cache %}
+<nav>
+    {% cache 60 menu %}
 {% block title %}
     <h1>Создать новость</h1>
     <form method="post">
@@ -9,4 +11,6 @@
     </form>
 <p>{{ new.title }} : {{new.date_pub }}</p>
 <p>{{ new.text }}</p>
+    {% endcache %}
+</nav>
 {% endblock %}
