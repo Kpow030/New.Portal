@@ -1,17 +1,30 @@
-<!DOCTYPE html>
-{% load censor_filter %}
-<html lang="en">
-<head>
-        <meta charset="UTF-5">
-        <title> Title </title>
-</head>
-<body>
-{% for new in news %}
-<p>{{ new.title|censor }}
-<a href="{{ new.get_absolute_url }}">News urs</a>
-</p>
-{% endfor %}
+{% extends 'index.html' %}
+{% load cache %}
+    News list
 {% block title %}
+
+
+{% block content %}
+
+<nav>
+    {% cache 60 menu %}
+
+<ul calss="list-group list-groupfkush">
+    {% for post in category_news_list %}
+        <li class="list-group-iten">
+            <small class="fw-bold">{{ post.date | date:'d M Y' }}</small>
+            <a href="{% url 'detail' post.id %}">{{ post.title }}</a>
+            <small class="text-muted ">(автор: {{ post.author}})</small> <br>
+            <small class="fw-bold">категории:
+                {% for category in post.category.all %}
+                    <a href="{% url 'category' category.id%}"{{ category }}</a>
+                {% endfor %}
+            </small>
+        </li>
+    {% endcache %}
+</ul>
+</nav>
+
+<p>{{ new.title }} : {{new.date_pub }}</p>
+<p>{{ new.text }}</p>
 {% endblock %}
-</body>
-</html>
