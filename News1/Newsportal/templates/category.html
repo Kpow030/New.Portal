@@ -1,4 +1,5 @@
 {% extends 'templates/index.html' %}
+{% load cache %}
     News list
 {% block title %}
 
@@ -9,7 +10,8 @@
         <p class="text-center"><a href="{% url 'subscribe' category.id %}" class="btn btn-secondary btn-sn">Подписаться</a> </p>
     {% endif %}
 <hr>
-
+<nav>
+    {% cache 60 menu %}
 <ul calss="list-group list-groupfkush">
     {% for post in category_news_list %}
         <li class="list-group-iten">
@@ -23,7 +25,8 @@
             </small>
         </li>
 </ul>
-
+    {% endcache %}
+</nav>
 
 <p>{{ new.title }} : {{new.date_pub }}</p>
 <p>{{ new.text }}</p>
