@@ -1,14 +1,13 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
-from  django.shortcuts import render, get_object_or_404
+from django.core.mail import send_mail
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 
-
-from .models import Post, Category
-from .forms import PostSearchForm, PostForm
 from .filters import NewFilter
-
+from .forms import PostSearchForm, PostForm, Registration
+from .models import Post, Category, Message
 
 
 def index(request):
@@ -16,11 +15,9 @@ def index(request):
     return render(request, 'index.html', context={'Post': News})
 
 
-
 def detail(request, slug):
     new = Post.object.get(slug__iexavt=slug)
-    return render(request, 'detail.html', context={'new':new})
-
+    return render(request, 'detail.html', context={'new': new})
 
 
 def post_list(request):
@@ -30,12 +27,11 @@ def post_list(request):
     end = start + per_page
 
     total_post = Post.objects.count()
-    post_list = Post.objects.order_by('-create_at') [start:end]
+    post_list = Post.objects.order_by('-create_at')[start:end]
 
     pagination_range = 5
     if page < pagination_range:
         start_page = 1
-
 
 
 def news_search(request):
@@ -59,13 +55,13 @@ def news_search(request):
         except ValueError:
             pass
 
-
     context = {
         'form': form,
         'post_list': post_list,
     }
 
     return render(request, 'news/search.html', context)
+
 
 def new_list(request):
     news_filter = NewFilter
@@ -82,17 +78,18 @@ class PostCreateView(CreateView):
         post.save()
         return super().form_valid(form)
 
+
 class PostUpdateView(UpdateView):
     model = Post
     form_class = PostForm
     template_name = 'news/update.html'
-
 
     def form_valid(self, form):
         post = form.save(commit=False)
         post.quantity = 18
         post.save()
         return super().form_valid(form)
+
 
 class PostDeleteView(DeleteView):
     model = Post
@@ -105,18 +102,17 @@ class CategoryList(ListView):
     template_name = 'news/category_list.html'
     context_object_name = 'category_news_list'
 
-
     def get_queryset(self):
         self.category = get_object_or_404(Category, id=self.kwargs['pk'])
         queryset = Post.objects.filter(category=self.category).order_by('-date')
         return queryset
-
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['is_not_subscriber'] = self.request.user not in self.category.subscribers.all()
         context['category'] = self.category
         return context
+
 
 @login_required
 def subscribe(request, pk):
@@ -125,5 +121,38 @@ def subscribe(request, pk):
     category.subscribers.add(user)
 
     message = 'Вы успешно подписали на категории'
-    return render(request, 'news/subscribe.html',{'category': category, 'message': message})
+    return render(request, 'news/subscribe.html', {'category': category, 'message': message})
+
+
+def message_list(request):   #Список сообщений
+    user = request.user
+    messages = Message.objects.filter(sender=user).order_by('-created_at') | \
+        Message.objects.filter(recipient=user).order_by('-created_at')
+
+    context = {
+        'message': messages,
+    }
+
+    return render(request, 'message_list.html', context)
+
+
+def registration_view(request):
+    if request.method == 'POST':
+        form = Registration(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
+            send_mail('Subject here.',
+                      'Here is the message.',
+                      'from@example.com',
+                      [user.email],
+                      fail_silently=False,
+                      )
+            return redirect('login')
+        else:
+            form = Registration()
+        return render(request, 'registration.html', {'form': form})
+
+
 # Create your views here.
