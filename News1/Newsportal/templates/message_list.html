@@ -1,0 +1,21 @@
+{% extends 'templates/index.html' %}
+
+{% for message in messages %}
+    <div class="message">
+        <div class="header">
+            <span class="sender">{{ message.sender.username }}</span>
+            <span class="timestamp">{{ message.created_at|timesince }}</span>
+        </div>
+        <div class="content">
+            {% if message.text %}
+                <p class="text">{{ message.text }}</p>
+            {% endif %}
+            {% for file in message.files.all %}
+                <a href="{{ file.file.url }}" class="file">{{ file.file.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+{% endfor %}
+
+<a href="{% url 'message_create' %}" class="btn">Создать сообщение</a>
+<a href="{% url 'file_create' %}" class="btn">Добавить файл</a>
